@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
-  corePlugins: {
-    // 保留其他核心插件，只针对字体和间距进行处理
-  },
   theme: {
     spacing: {
       1: "0.26667vw", // 1px → 0.26667vw (基于375设计稿)
@@ -23,8 +20,8 @@ export default {
       "3xl": "7.5vw", // 28px → 7.5vw
     },
     extend: {
-      color: {
-        primary: "#007AFF",
+      colors: {
+        cusColor: "red",
       },
     },
   },
