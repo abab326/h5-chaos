@@ -1,19 +1,18 @@
 <script setup lang="ts">
-import { watch } from 'vue'
-import { useRoute } from 'vue-router'
-     const a = ''
-const route = useRoute()
-
-// 监听路由变化，更新页面标题
-watch(
-  () => route.meta.title,
-  (newTitle) => {
-    if (newTitle) {
-      document.title = newTitle as string
-    }
-  },
-  { immediate: true }
-)
+  import { watch } from "vue";
+  import { useRoute } from "vue-router";
+  const route = useRoute();
+  const defaultTitle = "默认标题";
+  // 监听路由变化，更新页面标题
+  watch(
+    () => route.meta.title,
+    (newTitle) => {
+      if (newTitle) {
+        document.title = newTitle as string;
+      }
+    },
+    { immediate: true }
+  );
 </script>
 
 <template>
@@ -23,7 +22,7 @@ watch(
 </template>
 
 <style scoped>
-.app-container {
-  min-height: 100vh;
-}
+  .app-container {
+    min-height: 100vh;
+  }
 </style>
