@@ -1,7 +1,7 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import tailwindcssPlugin from "@tailwindcss/vite";
-import postcsspxtoviewport from "postcss-px-to-viewport-8-plugin";
+import postcssPxToViewport from "postcss-px-to-viewport-8-plugin";
 import { resolve } from "path";
 
 // https://vite.dev/config/
@@ -15,7 +15,7 @@ export default defineConfig({
   css: {
     postcss: {
       plugins: [
-        postcsspxtoviewport({
+        postcssPxToViewport({
           viewportWidth: 375,
           unitToConvert: "px",
           viewportUnit: "vw",
