@@ -4,7 +4,7 @@
 @theme {
   /* 设计稿宽度 */
   --design-width: 375;
-
+  --design-font-size: 16;
   /* px 转 vw 函数 */
   --px-to-vw: calc(var(--px) / var(--design-width) * 100vw);
 
@@ -76,7 +76,7 @@
 
 /* 自定义 vw 工具类 */
 @utility text-vw {
-  font-size: calc(var(--text-size) / var(--design-width) * 100vw);
+  font-size: calc(var(--design-font-size) / var(--design-width) * 100vw);
 }
 
 @utility spacing-vw {
