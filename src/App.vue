@@ -2,7 +2,6 @@
   import { watch } from "vue";
   import { useRoute } from "vue-router";
   const route = useRoute();
-  const defaultTitle = "默认标题";
   // 监听路由变化，更新页面标题
   watch(
     () => route.meta.title,
@@ -16,13 +15,9 @@
 </script>
 
 <template>
-  <div class="app-container">
+  <div class="h-screen">
     <router-view />
   </div>
 </template>
 
-<style scoped>
-  .app-container {
-    min-height: 100vh;
-  }
-</style>
+<style scoped></style>
