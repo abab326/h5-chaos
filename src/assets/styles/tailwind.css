@@ -1,1 +1,104 @@
+/* src/styles/global.css */
 @import "tailwindcss";
+
+@theme {
+  /* 设计稿宽度 */
+  --design-width: 375;
+
+  /* px 转 vw 函数 */
+  --px-to-vw: calc(var(--px) / var(--design-width) * 100vw);
+
+  /* 颜色配置 */
+  --color-primary: oklch(0.62 0.19 250);
+  --color-secondary: oklch(0.55 0.18 260);
+
+  /* 间距配置 - 使用 vw 单位 */
+  --spacing: calc(1 / var(--design-width) * 100vw);
+  --spacing-1: calc(1 / var(--design-width) * 100vw);
+  --spacing-2: calc(2 / var(--design-width) * 100vw);
+  --spacing-4: calc(4 / var(--design-width) * 100vw);
+  --spacing-8: calc(8 / var(--design-width) * 100vw);
+  --spacing-12: calc(12 / var(--design-width) * 100vw);
+  --spacing-16: calc(16 / var(--design-width) * 100vw);
+  --spacing-20: calc(20 / var(--design-width) * 100vw);
+  --spacing-24: calc(24 / var(--design-width) * 100vw);
+  --spacing-32: calc(32 / var(--design-width) * 100vw);
+
+  /* 字体大小配置 - 使用 vw 单位 */
+  --text-xs: calc(12 / var(--design-width) * 100vw);
+  --text-sm: calc(14 / var(--design-width) * 100vw);
+  --text-base: calc(16 / var(--design-width) * 100vw);
+  --text-lg: calc(18 / var(--design-width) * 100vw);
+  --text-xl: calc(20 / var(--design-width) * 100vw);
+  --text-2xl: calc(24 / var(--design-width) * 100vw);
+  --text-3xl: calc(30 / var(--design-width) * 100vw);
+
+  /* 断点配置 */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+
+  /* 容器配置 */
+  --container-3xs: 16rem;
+  --container-2xs: 18rem;
+  --container-xs: 20rem;
+  --container-sm: 24rem;
+  --container-md: 28rem;
+  --container-lg: 32rem;
+  --container-xl: 36rem;
+  --container-2xl: 42rem;
+  --container-3xl: 48rem;
+  --container-4xl: 56rem;
+  --container-5xl: 64rem;
+  --container-6xl: 72rem;
+  --container-7xl: 80rem;
+}
+
+/* 自定义工具类 */
+@utility container {
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (width >= 40rem) {
+    max-width: 40rem;
+  }
+
+  @media (width >= 48rem) {
+    max-width: 48rem;
+  }
+
+  @media (width >= 64rem) {
+    max-width: 64rem;
+  }
+}
+
+/* 自定义 vw 工具类 */
+@utility text-vw {
+  font-size: calc(var(--text-size) / var(--design-width) * 100vw);
+}
+
+@utility spacing-vw {
+  padding: calc(var(--spacing) / var(--design-width) * 100vw);
+  margin: calc(var(--spacing) / var(--design-width) * 100vw);
+}
+
+/* 基础样式 */
+html {
+  /* 禁用用户缩放，确保 vw 计算准确 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+/* 处理横屏情况 */
+@media (orientation: landscape) and (max-height: 500px) {
+  html {
+    --design-width: 667; /* 横屏时使用不同的设计稿宽度 */
+  }
+}

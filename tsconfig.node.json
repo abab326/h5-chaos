@@ -26,7 +26,6 @@
     "./src/**.d.ts",
     "vite.config.ts",
     "eslint.config.ts",
-    "tailwind.config.js",
-    "prettier.config.mjs",
+    "prettier.config.mjs"
   ]
 }

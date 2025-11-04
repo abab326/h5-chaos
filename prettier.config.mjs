@@ -1,6 +1,5 @@
-/** @type {import('prettier').Config & import('prettier-plugin-tailwindcss').PluginOptions} */
+/** @type {import('prettier').Config } */
 export default {
-  plugins: ["prettier-plugin-tailwindcss"],
   printWidth: 80,
   tabWidth: 2,
   useTabs: false,
@@ -18,5 +17,5 @@ export default {
   htmlWhitespaceSensitivity: "css",
   vueIndentScriptAndStyle: true,
   endOfLine: "auto",
-  embeddedLanguageFormatting: "auto",
+  embeddedLanguageFormatting: "auto"
 };
