@@ -2,7 +2,7 @@
  * HTTP 客户端类型定义
  */
 
-import type { AxiosInstance, AxiosRequestConfig } from "axios";
+import type { AxiosRequestConfig } from "axios";
 
 /**
  * 请求配置扩展
@@ -16,6 +16,8 @@ export interface RequestConfig extends AxiosRequestConfig {
   errorHandler?: "auto" | "custom" | "none";
   // 重试次数
   retryCount?: number;
+  // 当前重试次数
+  currentRetry?: number;
   // 缓存配置
   cache?: {
     // 是否启用缓存
@@ -50,32 +52,6 @@ export interface ErrorResponse {
   // 原始错误
   originalError?: any;
 }
-
-/**
- * HTTP 客户端接口
- */
-export interface HttpClient {
-  // 实例
-  instance: AxiosInstance;
-
-  // 请求方法
-  request<T = any>(config: RequestConfig): Promise<T>;
-  get<T = any>(url: string, config?: RequestConfig): Promise<T>;
-  post<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T>;
-  put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T>;
-  delete<T = any>(url: string, config?: RequestConfig): Promise<T>;
-  patch<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T>;
-
-  // 请求取消相关
-  cancelRequest(requestKey: string | number): void;
-  cancelAllRequests(): void;
-
-  // 配置相关
-  setBaseURL(baseURL: string): void;
-  setDefaultHeaders(headers: Record<string, string>): void;
-  setAuthToken(token: string | null): void;
-}
-
 /**
  * 请求记录接口
  */
@@ -92,4 +68,21 @@ export interface CacheItem<T = any> {
   data: T;
   timestamp: number;
   expireTime: number;
+}
+
+/**
+ * HTTP 客户端接口
+ */
+export interface HttpClient {
+  // 请求方法
+  request<T = any>(config: RequestConfig): Promise<T>;
+  get<T = any>(url: string, config?: RequestConfig): Promise<T>;
+  post<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T>;
+  put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T>;
+  delete<T = any>(url: string, config?: RequestConfig): Promise<T>;
+  patch<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T>;
+
+  // 请求取消相关
+  cancelRequest(requestKey: string | number): void;
+  cancelAllRequests(): void;
 }

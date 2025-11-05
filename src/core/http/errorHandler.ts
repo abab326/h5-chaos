@@ -4,7 +4,7 @@
  */
 
 import type { ErrorResponse } from "./types";
-
+import { Toast } from "tdesign-mobile-vue";
 /**
  * 错误类型常量
  */
@@ -31,25 +31,27 @@ export interface ErrorHandlerOptions {
   retry?: boolean;
   // 重试次数
   retryCount?: number;
-  // 自定义错误消息
-  customMessage?: string;
-  // 回调函数
-  onError?: (error: ErrorResponse) => void;
-  onSuccess?: () => void;
 }
 
 /**
  * 错误处理器类
  */
 export class ErrorHandler {
+  private readonly options: ErrorHandlerOptions;
+
+  defaultOptions: ErrorHandlerOptions = {
+    showToast: true,
+    retry: false,
+    retryCount: 3,
+  };
+  constructor(options: ErrorHandlerOptions = {}) {
+    this.options = { ...this.defaultOptions, ...options };
+  }
   /**
    * 处理错误
    */
-  static handleError(
-    error: any,
-    options: ErrorHandlerOptions = {}
-  ): ErrorResponse {
-    const { showToast = true, onError } = options;
+  handleError(error: any): ErrorResponse {
+    const { showToast = true } = this.options;
 
     // 标准化错误响应
     const errorResponse: ErrorResponse = this.normalizeError(error);
@@ -57,11 +59,6 @@ export class ErrorHandler {
     // 显示错误提示
     if (showToast) {
       this.showErrorToast(errorResponse.errorMessage);
-    }
-
-    // 执行自定义错误处理回调
-    if (onError) {
-      onError(errorResponse);
     }
 
     // 根据错误类型执行特定处理
@@ -73,7 +70,7 @@ export class ErrorHandler {
   /**
    * 标准化错误
    */
-  private static normalizeError(error: any): ErrorResponse {
+  normalizeError(error: any): ErrorResponse {
     // 如果已经是标准化的错误响应
     if (error.errorCode !== undefined && error.errorMessage !== undefined) {
       return error as ErrorResponse;
@@ -173,17 +170,17 @@ export class ErrorHandler {
   /**
    * 显示错误提示
    */
-  private static showErrorToast(message: string): void {
+  showErrorToast(message: string): void {
     // 这里可以集成具体的UI库的toast组件
     // 例如：ElMessage.error(message);
     // 暂时使用console.log作为替代
-    console.error("API Error:", message);
+    Toast.error({ message, duration: 2000 });
   }
 
   /**
    * 处理特定类型的错误
    */
-  private static handleSpecificError(error: ErrorResponse): void {
+  handleSpecificError(error: ErrorResponse): void {
     switch (error.errorCode) {
       case 401:
       case ErrorTypeMap.client:
@@ -202,7 +199,7 @@ export class ErrorHandler {
   /**
    * 获取错误类型
    */
-  static getErrorType(error: any): ErrorType {
+  getErrorType(error: any): ErrorType {
     if (error.isAxiosError) {
       if (!error.response) {
         if (error.code === "ECONNABORTED") {
@@ -229,68 +226,17 @@ export class ErrorHandler {
 
     return ErrorTypeMap.unknown;
   }
-
-  /**
-   * 格式化错误消息
-   */
-  static formatErrorMessage(error: any): string {
-    const errorResponse = this.normalizeError(error);
-    return errorResponse.errorMessage;
-  }
-
   /**
    * 判断错误是否可重试
    */
-  static isRetryable(errorType: ErrorType): boolean {
-    const retryableList: ErrorType[] = [
+  isRetryAble(errorType: ErrorType): boolean {
+    const retryAbleList: ErrorType[] = [
       ErrorTypeMap.network,
       ErrorTypeMap.server,
       ErrorTypeMap.timeout,
     ];
-    return retryableList.includes(errorType);
+    return retryAbleList.includes(errorType);
   }
-}
-
-/**
- * 重试装饰器
- * 用于自动重试失败的函数调用
- */
-export function Retryable(maxRetries: number = 3, delay: number = 1000) {
-  return function (
-    _target: any,
-    _propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    const originalMethod = descriptor.value;
-
-    descriptor.value = async function (...args: any[]) {
-      let lastError: any;
-
-      for (let i = 0; i <= maxRetries; i++) {
-        try {
-          return await originalMethod.apply(this, args);
-        } catch (error: any) {
-          lastError = error;
-
-          // 只对网络错误、超时错误和服务器错误进行重试
-          const errorType = ErrorHandler.getErrorType(error);
-          const shouldRetry = ErrorHandler.isRetryable(errorType);
-          if (!shouldRetry || i >= maxRetries) {
-            throw error;
-          }
-
-          // 等待后重试
-          await new Promise((resolve) =>
-            setTimeout(resolve, delay * Math.pow(2, i))
-          );
-        }
-      }
-
-      throw lastError;
-    };
-
-    return descriptor;
-  };
 }
 
 export default ErrorHandler;

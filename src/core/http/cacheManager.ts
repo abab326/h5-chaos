@@ -34,7 +34,7 @@ export interface CacheStats {
 }
 
 /**
- * 缓存管理器类
+ * 缓存管理器类，提供请求数据的缓存功能
  */
 export class CacheManager {
   private cache: Map<string, CacheItem>;
