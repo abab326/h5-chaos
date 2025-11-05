@@ -9,7 +9,7 @@ export const createBuildConfig = ({
   return {
     build: {
       cssCodeSplit: true,
-      cssTarget: ["chrome61", "safari", "edge", "firefox"],
+      cssTarget: ["chrome61", "safari14", "edge88", "firefox78"],
       // 优化构建输出
       target: "es2020",
       chunkSizeWarningLimit: 1000, // 2MB 警告阈值
