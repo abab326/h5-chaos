@@ -1,4 +1,8 @@
-import { type RouteRecordRaw } from "vue-router";
+import {
+  createRouter,
+  createWebHistory,
+  type RouteRecordRaw,
+} from "vue-router";
 
 // 定义路由配置
 const routes: RouteRecordRaw[] = [
@@ -20,4 +24,10 @@ const routes: RouteRecordRaw[] = [
   },
 ];
 
-export default routes;
+// 创建路由实例
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+});
+
+export default router;
