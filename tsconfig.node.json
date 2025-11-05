@@ -23,6 +23,7 @@
     "noUncheckedSideEffectImports": true
   },
   "include": [
+    "./config/**/*.ts",
     "./src/**.d.ts",
     "vite.config.ts",
     "eslint.config.ts",

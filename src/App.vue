@@ -15,7 +15,7 @@
 </script>
 
 <template>
-  <div class="h-screen">
+  <div class="flex h-screen w-screen overflow-hidden">
     <router-view />
   </div>
 </template>

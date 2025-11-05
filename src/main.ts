@@ -2,8 +2,8 @@ import { createApp } from "vue";
 import { createPinia } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 import App from "./App.vue";
-import "./assets/styles/tailwind.css";
-import "./assets/styles/global.less";
+import "./styles/tailwind.css";
+import "./styles/global.less";
 
 // 导入路由配置
 import routes from "./router";
