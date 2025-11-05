@@ -25,10 +25,10 @@ const buildUserConfig = ({
   mode: string;
 }): UserConfig => {
   // 创建基础配置
-  const baseConfig = createBaseConfig();
-  const serverConfig = createServerConfig();
-  const buildConfig = createBuildConfig();
-  const cssConfig = createCssConfig();
+  const baseConfig = createBaseConfig({ command, mode });
+  const serverConfig = createServerConfig({ command, mode });
+  const buildConfig = createBuildConfig({ command, mode });
+  const cssConfig = createCssConfig({ command, mode });
   const pluginsConfig = buildPlugins({ command, mode });
   // 合并所有配置
   const mergedConfig = mergeConfigs(

@@ -1,13 +1,12 @@
-import { type UserConfig } from "vite";
+import type { UserConfig, ConfigEnv } from "vite";
 import { resolve } from "path";
-
-// 获取当前环境
-export const isProduction = process.env.NODE_ENV === "production";
 
 /**
  * 基础配置
  */
-export const createBaseConfig = (): Partial<UserConfig> => {
+export const createBaseConfig = ({
+  command,
+}: ConfigEnv): Partial<UserConfig> => {
   return {
     resolve: {
       alias: {
@@ -15,9 +14,8 @@ export const createBaseConfig = (): Partial<UserConfig> => {
       },
     },
     esbuild: {
-      target: "es2020", // 针对移动端优化的目标
-      // 压缩相关配置
-      drop: isProduction ? ["console", "debugger"] : [],
+      target: "es2020",
+      drop: command === "build" ? ["console", "debugger"] : [],
     },
   };
 };
