@@ -10,18 +10,15 @@ import type {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
-import type {
-  RequestConfig,
-  ApiResponse,
-  HttpClient,
-  ErrorResponse,
-} from "./types";
+import type { RequestConfig, ApiResponse, HttpClient } from "./types";
 import { CancelManager } from "./cancelManager";
 import { CacheManager } from "./cacheManager";
+import { ErrorHandler } from "./errorHandler";
 
 export interface HttpClientOptions {
   cancelManager?: CancelManager;
   cacheManager?: CacheManager;
+  errorHandler?: ErrorHandler;
   baseURL?: string;
   timeout?: number;
   headers?: AxiosRequestHeaders;
@@ -34,10 +31,13 @@ class HttpClientImpl implements HttpClient {
   instance: AxiosInstance;
   private readonly cancelManager: CancelManager;
   private readonly cacheManager: CacheManager;
+  private readonly errorHandler: ErrorHandler;
 
   constructor(options?: HttpClientOptions) {
     this.cancelManager = options?.cancelManager || new CancelManager();
     this.cacheManager = options?.cacheManager || new CacheManager();
+    this.errorHandler = options?.errorHandler || new ErrorHandler();
+
     this.instance = axios.create({
       baseURL: options?.baseURL || import.meta.env.VITE_API_BASE_URL || "",
       timeout: options?.timeout || 1000 * 30,
@@ -58,10 +58,23 @@ class HttpClientImpl implements HttpClient {
   private setupResponseInterceptor(): void {
     this.instance.interceptors.response.use(
       (response: AxiosResponse) => {
-        return Promise.resolve(response.data);
+        const { config, status, data } = response;
+        // 如查返回的是错误响应，使用错误处理器处理
+        if (status !== 200) {
+          const errorResponse = this.errorHandler.handleError(response.data);
+          return Promise.reject(errorResponse);
+        }
+        const requestConfig = config as RequestConfig;
+        // 如果请求的是缓存请求，将响应数据缓存起来
+        if (requestConfig.cache?.enabled) {
+          this.cacheManager.set(requestConfig, data);
+        }
+        return Promise.resolve(data);
       },
       (error: any): Promise<any> => {
-        return Promise.reject(error);
+        // 错误处理
+        const errorResponse = this.errorHandler.handleError(error);
+        return Promise.reject(errorResponse);
       }
     );
   }
@@ -69,10 +82,13 @@ class HttpClientImpl implements HttpClient {
   private setupRequestInterceptor() {
     this.instance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
+        //
         return config;
       },
       (error: AxiosError) => {
-        return Promise.reject(error);
+        // 错误处理
+        const errorResponse = this.errorHandler.handleError(error);
+        return Promise.reject(errorResponse);
       }
     );
   }
