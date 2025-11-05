@@ -27,7 +27,7 @@ export interface HttpClientOptions {
 /**
  * HTTP 客户端实现
  */
-class HttpClientImpl implements HttpClient {
+export class AxiosHttpClient implements HttpClient {
   instance: AxiosInstance;
   private readonly cancelManager: CancelManager;
   private readonly cacheManager: CacheManager;
@@ -193,5 +193,5 @@ class HttpClientImpl implements HttpClient {
 }
 
 // 导出单例
-export const defaultHttpClient = new HttpClientImpl();
+export const defaultHttpClient = new AxiosHttpClient();
 export default defaultHttpClient;

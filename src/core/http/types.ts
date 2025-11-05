@@ -82,7 +82,7 @@ export interface HttpClient {
   delete<T = any>(url: string, config?: RequestConfig): Promise<T>;
   patch<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T>;
 
-  // 请求取消相关
+  // 请求取消
   cancelRequest(requestKey: string | number): void;
   cancelAllRequests(): void;
 }
