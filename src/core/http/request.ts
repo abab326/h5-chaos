@@ -8,7 +8,7 @@ import type {
 } from "axios";
 
 import { concurrencyHandler } from "./interceptors/concurrency";
-import type { ApiRequestConfig, HttpClient, RequestConfig } from "./types";
+import type { ApiRequestConfig, HttpClient } from "./types";
 import type { RequestStatus } from "./interceptors/concurrency";
 
 // 响应数据类型
@@ -53,7 +53,7 @@ class RequestManager implements HttpClient {
     );
   }
   request<T = any>(config: ApiRequestConfig): Promise<[error: any, T | null]> {
-    return new Promise<[error: any, T | null]>((resolve, reject) => {
+    return new Promise<[error: any, T | null]>((resolve, _reject) => {
       this.instance
         .request<T>(config)
         .then((response) => {

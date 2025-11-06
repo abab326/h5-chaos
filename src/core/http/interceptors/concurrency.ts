@@ -277,7 +277,10 @@ export class ConcurrencyHandler {
   /**
    * 取消请求
    */
-  public cancelRequest(requestKey: string): void {}
+  public cancelRequest(requestKey: string): void {
+    //
+    console.log("取消请求", requestKey);
+  }
 
   /**
    * 设置最大并发数
