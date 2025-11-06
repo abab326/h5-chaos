@@ -1,197 +1,202 @@
-/**
- * HTTP 请求核心实现
- * 封装 Axios 实例和拦截器系统
- */
+import axios from "axios";
 
-import axios, { AxiosError } from "axios";
 import type {
   AxiosInstance,
-  AxiosRequestHeaders,
+  AxiosError,
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from "axios";
-import type { RequestConfig, ApiResponse, HttpClient } from "./types";
-import { CancelManager } from "./cancelManager";
-import { CacheManager } from "./cacheManager";
-import { ErrorHandler } from "./errorHandler";
 
-export interface HttpClientOptions {
-  cancelManager?: CancelManager;
-  cacheManager?: CacheManager;
-  errorHandler?: ErrorHandler;
-  baseURL?: string;
-  timeout?: number;
-  headers?: AxiosRequestHeaders;
+import { concurrencyHandler } from "./interceptors/concurrency";
+import type { ApiRequestConfig, HttpClient, RequestConfig } from "./types";
+import type { RequestStatus } from "./interceptors/concurrency";
+
+// 响应数据类型
+export interface ResponseData<T = any> {
+  code: number;
+  message: string;
+  data: T;
 }
 
-/**
- * HTTP 客户端实现
- */
-export class AxiosHttpClient implements HttpClient {
-  instance: AxiosInstance;
-  private readonly cancelManager: CancelManager;
-  private readonly cacheManager: CacheManager;
-  private readonly errorHandler: ErrorHandler;
+class RequestManager implements HttpClient {
+  // axios 实例
+  private instance: AxiosInstance;
 
-  constructor(options?: HttpClientOptions) {
-    this.cancelManager = options?.cancelManager || new CancelManager();
-    this.cacheManager = options?.cacheManager || new CacheManager();
-    this.errorHandler = options?.errorHandler || new ErrorHandler();
-    // 配置 axios 实例
+  constructor() {
+    // 创建 axios 实例
     this.instance = axios.create({
-      baseURL: options?.baseURL || import.meta.env.VITE_API_BASE_URL || "",
-      timeout: options?.timeout || 1000 * 30,
+      baseURL: import.meta.env.VUE_APP_BASE_API || "/api",
+      timeout: 10000,
       headers: {
-        "Content-Type": "application/json",
-        ...options?.headers,
+        "Content-Type": "application/json;charset=UTF-8",
       },
     });
-    // 请求拦截器
-    this.setupRequestInterceptor();
-    // 响应拦截器
-    this.setupResponseInterceptor();
-  }
 
-  /**
-   * 设置响应拦截器
-   */
-  private setupResponseInterceptor(): void {
-    this.instance.interceptors.response.use(
-      (response: AxiosResponse) => {
-        const { config, status, data } = response;
-        // 如查返回的是错误响应，使用错误处理器处理
-        if (status !== 200) {
-          const errorResponse = this.errorHandler.handleError(response.data);
-          return Promise.reject(errorResponse);
-        }
-        const requestConfig = config as RequestConfig;
-        // 如果请求的是缓存请求，将响应数据缓存起来
-        if (requestConfig.cache?.enabled) {
-          this.cacheManager.set(requestConfig, data);
-        }
-        return Promise.resolve(data);
-      },
-      (error: any): Promise<any> => {
-        // 错误处理
-        const errorResponse = this.errorHandler.handleError(error);
-        return Promise.reject(errorResponse);
-      }
-    );
-  }
-  // 配置请求拦截器
-  private setupRequestInterceptor() {
+    // 请求拦截器 - 使用并发处理器
     this.instance.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        //
-        return config;
+        return concurrencyHandler.requestInterceptor(config);
       },
       (error: AxiosError) => {
-        // 错误处理
-        const errorResponse = this.errorHandler.handleError(error);
-        return Promise.reject(errorResponse);
+        return Promise.reject(error);
+      }
+    );
+
+    // 响应拦截器
+    this.instance.interceptors.response.use(
+      (response: AxiosResponse) => {
+        return this.responseInterceptor(response);
+      },
+      (error: AxiosError) => {
+        return this.responseInterceptor(error);
       }
     );
   }
-
-  /**
-   * 处理并发控制
-   */
-  private async handleConcurrency<T>(fn: () => Promise<T>): Promise<T> {
-    return this.cancelManager.executeWithConcurrency(fn);
-  }
-
-  /**
-   * 通用请求方法
-   */
-  async request<T = any>(config: RequestConfig): Promise<T> {
-    // 检查缓存
-    if (config.cache?.enabled) {
-      const cachedData = this.cacheManager.get(config);
-      if (cachedData) {
-        // 直接返回缓存数据
-        return Promise.resolve(cachedData as T);
-      }
-    }
-
-    // 执行请求（带并发控制）
-    return this.handleConcurrency(async () => {
-      try {
-        const response = await this.instance.request<ApiResponse<T>>(config);
-        return response.data as unknown as T;
-      } catch (error: any) {
-        // 重新抛出错误
-        throw error;
-      }
+  request<T = any>(config: ApiRequestConfig): Promise<[error: any, T | null]> {
+    return new Promise<[error: any, T | null]>((resolve, reject) => {
+      this.instance
+        .request<T>(config)
+        .then((response) => {
+          resolve([null, response.data]);
+        })
+        .catch((error) => {
+          resolve([error, null]);
+        });
     });
   }
-
-  /**
-   * GET 请求
-   */
-  get<T = any>(url: string, config?: RequestConfig): Promise<T> {
-    return this.request<T>({ ...config, method: "get", url });
+  get<T = any>(
+    url: string,
+    config?: ApiRequestConfig
+  ): Promise<[error: any, T | null]> {
+    return this.request<T>({
+      url,
+      method: "get",
+      ...config,
+    });
+  }
+  post<T = any>(
+    url: string,
+    data?: any,
+    config?: ApiRequestConfig
+  ): Promise<[error: any, T | null]> {
+    return this.request<T>({
+      url,
+      method: "post",
+      data,
+      ...config,
+    });
+  }
+  put<T = any>(
+    url: string,
+    data?: any,
+    config?: ApiRequestConfig
+  ): Promise<[error: any, T | null]> {
+    return this.request<T>({
+      url,
+      method: "put",
+      data,
+      ...config,
+    });
+  }
+  delete<T = any>(
+    url: string,
+    config?: ApiRequestConfig
+  ): Promise<[error: any, T | null]> {
+    return this.request<T>({
+      url,
+      method: "delete",
+      ...config,
+    });
+  }
+  patch<T = any>(
+    url: string,
+    data?: any,
+    config?: ApiRequestConfig
+  ): Promise<[error: any, T | null]> {
+    return this.request<T>({
+      url,
+      method: "patch",
+      data,
+      ...config,
+    });
+  }
+  cancelRequest(requestKey: string): void {
+    concurrencyHandler.cancelRequest(requestKey);
   }
 
   /**
-   * POST 请求
+   * 响应拦截器
    */
-  post<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T> {
-    return this.request<T>({ ...config, method: "post", url, data });
+  private responseInterceptor(
+    response: AxiosResponse | AxiosError
+  ): AxiosResponse | Promise<AxiosResponse> {
+    if ("config" in response) {
+      // 成功响应
+      return response as AxiosResponse<ResponseData>;
+    } else {
+      // 错误响应
+      return Promise.reject(response);
+    }
   }
 
   /**
-   * PUT 请求
+   * 获取当前请求状态
    */
-  put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T> {
-    return this.request<T>({ ...config, method: "put", url, data });
-  }
-
-  /**
-   * DELETE 请求
-   */
-  delete<T = any>(url: string, config?: RequestConfig): Promise<T> {
-    return this.request<T>({ ...config, method: "delete", url });
-  }
-
-  /**
-   * PATCH 请求
-   */
-  patch<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T> {
-    return this.request<T>({ ...config, method: "patch", url, data });
-  }
-
-  /**
-   * 取消请求
-   */
-  cancelRequest(requestKey: string | number): void {
-    this.cancelManager.cancelRequest(requestKey);
+  public getRequestStatus(): RequestStatus {
+    return concurrencyHandler.getRequestStatus();
   }
 
   /**
    * 取消所有请求
    */
-  cancelAllRequests(): void {
-    this.cancelManager.cancelAllRequests();
+  public cancelAllRequests(): void {
+    concurrencyHandler.cancelAllRequests();
   }
 
   /**
-   * 设置基础 URL
+   * 设置最大并发数
    */
-  setBaseURL(baseURL: string): void {
-    this.instance.defaults.baseURL = baseURL;
+  public setMaxConcurrent(max: number): void {
+    concurrencyHandler.setMaxConcurrent(max);
   }
 
   /**
-   * 设置默认请求头
+   * 获取当前并发数
    */
-  setDefaultHeaders(headers: Record<string, string>): void {
-    this.instance.defaults.headers.common = {
-      ...this.instance.defaults.headers.common,
-      ...headers,
-    };
+  public getMaxConcurrent(): number {
+    return concurrencyHandler.getMaxConcurrent();
+  }
+
+  /**
+   * 获取等待队列长度
+   */
+  public getWaitingCount(): number {
+    return concurrencyHandler.getWaitingCount();
+  }
+
+  /**
+   * 获取执行中请求数量
+   */
+  public getExecutingCount(): number {
+    return concurrencyHandler.getExecutingCount();
+  }
+
+  /**
+   * 获取等待中的请求数量
+   */
+  public getPendingCount(): number {
+    return concurrencyHandler.getPendingCount();
+  }
+
+  /**
+   * 清除所有等待中的请求
+   */
+  public clearPendingRequests(): void {
+    concurrencyHandler.clearPendingRequests();
   }
 }
 
-// 导出单例
-export const defaultHttpClient = new AxiosHttpClient();
-export default defaultHttpClient;
+// 创建单例实例
+const requestManager = new RequestManager();
+
+export default requestManager;

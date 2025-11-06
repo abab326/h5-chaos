@@ -2,12 +2,9 @@
  * HTTP 客户端类型定义
  */
 
-import type { AxiosRequestConfig } from "axios";
+import type { InternalAxiosRequestConfig, AxiosRequestConfig } from "axios";
 
-/**
- * 请求配置扩展
- */
-export interface RequestConfig extends AxiosRequestConfig {
+export interface CommonConfig {
   // 是否需要认证令牌
   requiresAuth?: boolean;
   // 是否显示加载状态
@@ -25,8 +22,17 @@ export interface RequestConfig extends AxiosRequestConfig {
     // 缓存过期时间（毫秒）
     expireTime?: number;
   };
+  // 是否跳过重复请求检查
+  skipDuplicateCheck?: boolean;
+  // 是否跳过并发控制
+  skipConcurrencyControl?: boolean;
 }
+/**
+ * 请求配置扩展
+ */
+export type RequestConfig = InternalAxiosRequestConfig & CommonConfig;
 
+export type ApiRequestConfig = AxiosRequestConfig & CommonConfig;
 /**
  * 响应数据结构
  */
@@ -125,12 +131,30 @@ export interface AxiosRequestManager {
  */
 export interface HttpClient {
   // 请求方法
-  request<T = any>(config: RequestConfig): Promise<T>;
-  get<T = any>(url: string, config?: RequestConfig): Promise<T>;
-  post<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T>;
-  put<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T>;
-  delete<T = any>(url: string, config?: RequestConfig): Promise<T>;
-  patch<T = any>(url: string, data?: any, config?: RequestConfig): Promise<T>;
+  request<T = any>(config: ApiRequestConfig): Promise<[error: any, T | null]>;
+  get<T = any>(
+    url: string,
+    config?: ApiRequestConfig
+  ): Promise<[error: any, T | null]>;
+  post<T = any>(
+    url: string,
+    data?: any,
+    config?: ApiRequestConfig
+  ): Promise<[error: any, T | null]>;
+  put<T = any>(
+    url: string,
+    data?: any,
+    config?: ApiRequestConfig
+  ): Promise<[error: any, T | null]>;
+  delete<T = any>(
+    url: string,
+    config?: ApiRequestConfig
+  ): Promise<[error: any, T | null]>;
+  patch<T = any>(
+    url: string,
+    data?: any,
+    config?: ApiRequestConfig
+  ): Promise<[error: any, T | null]>;
 
   // 请求取消
   cancelRequest(requestKey: string | number): void;
