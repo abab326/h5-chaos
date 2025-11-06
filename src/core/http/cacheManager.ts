@@ -56,24 +56,10 @@ export class CacheManager {
     // 定期清理过期缓存
     this.startCleanupInterval();
   }
-
-  /**
-   * 生成缓存键
-   */
-  generateCacheKey(config: RequestConfig): string {
-    const { method = "get", url = "", params = {}, data = {} } = config;
-
-    // 对于GET请求，data会被忽略
-    const keyData = method.toLowerCase() === "get" ? params : data;
-
-    return `${method.toUpperCase()}-${url}-${JSON.stringify(keyData)}`;
-  }
-
   /**
    * 获取缓存
    */
-  get<T = any>(config: RequestConfig): T | null {
-    const key = this.generateCacheKey(config);
+  get<T = any>(key: string): T | null {
     const cacheItem = this.cache.get(key);
 
     if (!cacheItem) {
@@ -84,7 +70,7 @@ export class CacheManager {
 
     // 检查是否过期
     const now = Date.now();
-    const expireTime = config.cache?.expireTime || this.defaultExpireTime;
+    const expireTime = cacheItem.expireTime;
 
     if (now - cacheItem.timestamp > expireTime) {
       // 缓存过期，移除
@@ -104,15 +90,11 @@ export class CacheManager {
   /**
    * 设置缓存
    */
-  set<T = any>(config: RequestConfig, data: T): void {
-    // 如果缓存未启用，直接返回
-    if (!config.cache?.enabled) {
-      return;
-    }
-
-    const key = this.generateCacheKey(config);
-    const expireTime = config.cache?.expireTime || this.defaultExpireTime;
-
+  set<T = any>(
+    key: string,
+    data: T,
+    expireTime: number = this.defaultExpireTime
+  ): void {
     // 检查容量限制
     this.enforceCapacity();
 
@@ -129,8 +111,7 @@ export class CacheManager {
   /**
    * 删除缓存
    */
-  delete(config: RequestConfig): boolean {
-    const key = this.generateCacheKey(config);
+  delete(key: string): boolean {
     const result = this.cache.delete(key);
 
     if (result) {
@@ -268,8 +249,7 @@ export class CacheManager {
   /**
    * 检查是否存在缓存
    */
-  has(config: RequestConfig): boolean {
-    const key = this.generateCacheKey(config);
+  has(key: string): boolean {
     return this.cache.has(key);
   }
 
@@ -283,8 +263,7 @@ export class CacheManager {
   /**
    * 获取缓存项的剩余有效期
    */
-  getRemainingTime(config: RequestConfig): number | null {
-    const key = this.generateCacheKey(config);
+  getRemainingTime(key: string): number | null {
     const cacheItem = this.cache.get(key);
 
     if (!cacheItem) {

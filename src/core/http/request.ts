@@ -37,7 +37,7 @@ export class AxiosHttpClient implements HttpClient {
     this.cancelManager = options?.cancelManager || new CancelManager();
     this.cacheManager = options?.cacheManager || new CacheManager();
     this.errorHandler = options?.errorHandler || new ErrorHandler();
-
+    // 配置 axios 实例
     this.instance = axios.create({
       baseURL: options?.baseURL || import.meta.env.VITE_API_BASE_URL || "",
       timeout: options?.timeout || 1000 * 30,
