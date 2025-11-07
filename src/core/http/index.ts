@@ -1,5 +1,5 @@
-import defaultHttpClient, { AxiosHttpClient } from "./request";
+import requestManager from "./request";
 import type { HttpClient } from "./types";
+
 export * from "./types";
-export { AxiosHttpClient };
-export default defaultHttpClient as HttpClient;
+export default requestManager as HttpClient;
