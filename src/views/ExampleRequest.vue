@@ -133,7 +133,7 @@
 
 <script setup lang="ts">
   import { ref } from "vue";
-  import { userApi, articleApi, uploadApi, apiUtils } from "@/services";
+  import { userApi, articleApi, uploadApi, apiUtils } from "@/api";
 
   // 响应式数据
   const loading = ref(false);

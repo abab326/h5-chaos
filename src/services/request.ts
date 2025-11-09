@@ -410,12 +410,7 @@ class Request {
     const link = document.createElement("a");
     link.href = downloadUrl;
 
-    // 使用 lodash 确定最终文件名
-    const finalFilename = !isEmpty(filename)
-      ? filename
-      : !isEmpty(options?.filename)
-        ? options!.filename
-        : "download";
+    const finalFilename = filename || options?.filename || "download";
 
     link.download = finalFilename!;
     document.body.appendChild(link);

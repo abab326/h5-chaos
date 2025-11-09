@@ -155,16 +155,16 @@
       <div class="mt-12 bg-white rounded-lg shadow-md p-6">
         <h3 class="text-xl font-semibold text-gray-900 mb-4">快速开始</h3>
         <div class="bg-gray-50 rounded-lg p-4">
-          <pre
-            class="text-sm text-gray-800 overflow-x-auto"
-          ><code>// 使用封装的请求服务
-import { userApi, articleApi } from '@/services'
-
-// 获取用户信息
-const userInfo = await userApi.getUserInfo()
-
+          <pre class="text-sm text-gray-800 overflow-x-auto">
+          <code>
+// 使用封装的请求服务
+ import { userApi, articleApi } from '@/api'
+// 获取用户信息     
+ const userInfo = await userApi.getUserInfo()
+ const articles = await articleApi.getList({ page: 1, size: 10 })
 // 获取文章列表
-const articles = await articleApi.getList({ page: 1, size: 10 })</code></pre>
+           </code>
+         </pre>
         </div>
       </div>
     </div>
