@@ -15,6 +15,14 @@ const routes: RouteRecordRaw[] = [
     },
   },
   {
+    path: "/example-request",
+    name: "ExampleRequest",
+    component: () => import("@/views/ExampleRequest.vue"),
+    meta: {
+      title: "请求示例",
+    },
+  },
+  {
     path: "/:pathMatch(.*)*",
     name: "NotFound",
     component: () => import("@/views/NotFound.vue"),

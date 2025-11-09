@@ -32,6 +32,12 @@
   --text-xl: calc(20 / var(--design-width) * 100vw);
   --text-2xl: calc(24 / var(--design-width) * 100vw);
   --text-3xl: calc(30 / var(--design-width) * 100vw);
+  --text-4xl: calc(36 / var(--design-width) * 100vw);
+  --text-5xl: calc(48 / var(--design-width) * 100vw);
+  --text-6xl: calc(60 / var(--design-width) * 100vw);
+  --text-7xl: calc(72 / var(--design-width) * 100vw);
+  --text-8xl: calc(96 / var(--design-width) * 100vw);
+  --text-9xl: calc(128 / var(--design-width) * 100vw);
 
   /* 断点配置 */
   --breakpoint-sm: 640px;
@@ -40,19 +46,21 @@
   --breakpoint-xl: 1280px;
 
   /* 容器配置 */
-  --container-3xs: 16rem;
-  --container-2xs: 18rem;
-  --container-xs: 20rem;
-  --container-sm: 24rem;
-  --container-md: 28rem;
-  --container-lg: 32rem;
-  --container-xl: 36rem;
-  --container-2xl: 42rem;
-  --container-3xl: 48rem;
-  --container-4xl: 56rem;
-  --container-5xl: 64rem;
-  --container-6xl: 72rem;
-  --container-7xl: 80rem;
+  --container-3xs: calc(16 / var(--design-width) * 100vw);
+  --container-2xs: calc(18 / var(--design-width) * 100vw);
+  --container-xs: calc(20 / var(--design-width) * 100vw);
+  --container-sm: calc(24 / var(--design-width) * 100vw);
+  --container-md: calc(28 / var(--design-width) * 100vw);
+  --container-lg: calc(32 / var(--design-width) * 100vw);
+  --container-xl: calc(36 / var(--design-width) * 100vw);
+  --container-2xl: calc(42 / var(--design-width) * 100vw);
+  --container-3xl: calc(48 / var(--design-width) * 100vw);
+  --container-4xl: calc(56 / var(--design-width) * 100vw);
+  --container-5xl: calc(64 / var(--design-width) * 100vw);
+  --container-6xl: calc(72 / var(--design-width) * 100vw);
+  --container-7xl: calc(80 / var(--design-width) * 100vw);
+  --container-8xl: calc(96 / var(--design-width) * 100vw);
+  --container-9xl: calc(128 / var(--design-width) * 100vw);
 }
 
 /* 自定义 vw 工具类 */

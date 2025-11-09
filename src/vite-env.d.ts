@@ -6,8 +6,16 @@ declare module "*.vue" {
   export default component;
 }
 
-declare module "postcss-px-to-viewport" {
-  import type { Plugin } from "postcss";
-  const plugin: Plugin;
-  export default plugin;
+interface ViteTypeOptions {
+  strictImportMetaEnv: unknown;
+}
+
+interface ImportMetaEnv {
+  readonly VITE_APP_TITLE: string;
+  // 更多环境变量...
+  readonly VITE_API_BASE_URL: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
 }
