@@ -4,12 +4,12 @@ import axios, {
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from "axios";
+import type { RequestConfig } from "./types";
 import type {
-  RequestConfig,
   RequestOptions,
-  ResponseData,
   RequestError,
-} from "./types";
+  ApiResponse as ResponseData,
+} from "@/types/http";
 
 import { isEmpty, isNull, isUndefined } from "lodash-es";
 // 默认配置

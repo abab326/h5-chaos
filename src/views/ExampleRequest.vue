@@ -190,7 +190,9 @@
         page: 1,
         size: 10,
       });
-      const { list, total: totalCount } = apiUtils.handleListResponse(response);
+      const { list, total: totalCount } = apiUtils.handleListResponse(
+        response.data
+      );
       articles.value = list;
       total.value = totalCount;
     } catch (error: any) {
@@ -210,6 +212,8 @@
         title: "新文章标题",
         content: "这是文章内容",
         author: "示例作者",
+        category: "技术",
+        tags: ["Vue", "TypeScript"],
       });
       // 创建成功后重新获取文章列表
       await getArticleList();
@@ -240,7 +244,7 @@
       errorMessage.value = "";
       const response = await uploadApi.uploadImage(selectedFile.value, {
         showLoading: false,
-        onProgress: (progress) => {
+        onProgress: (progress: number) => {
           uploadProgress.value = progress;
         },
       });

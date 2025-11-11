@@ -1,43 +1,58 @@
-// API 模块统一导出入口
+// API 模块统一导出入口（重构版）
 
 // 用户相关 API
-export { default as userApi } from "./user";
-
-// 文件上传相关 API
-export { default as uploadApi } from "./upload";
-
-// 通用 CRUD API 创建函数
-export { default as createCrudApi } from "./crud";
-
-// 文章相关 API
-export { default as articleApi } from "./article";
+import userApi from "./user";
+export { userApi };
 
 // 产品相关 API
-export { default as productApi } from "./product";
+import productApi from "./product";
+export { productApi };
+
+// 文件上传相关 API
+import uploadApi from "./upload";
+export { uploadApi };
+
+// 文章相关 API
+import articleApi from "./article";
+export { articleApi };
 
 // 系统相关 API
-export { default as systemApi } from "./system";
+import systemApi from "./system";
+export { systemApi };
 
 // API 工具函数
-export { default as apiUtils } from "./utils";
+import apiUtils from "./utils";
+export { apiUtils };
+
+// 通用 CRUD API 创建函数
+import createCrudApi from "./crud";
+export { createCrudApi };
 
 // 默认导出所有 API 的集合对象
-import userApi from "./user";
-import uploadApi from "./upload";
-import articleApi from "./article";
-import productApi from "./product";
-import systemApi from "./system";
-import apiUtils from "./utils";
-import createCrudApi from "./crud";
-
 const api = {
   user: userApi,
+  product: productApi,
   upload: uploadApi,
   article: articleApi,
-  product: productApi,
   system: systemApi,
   utils: apiUtils,
   createCrudApi: createCrudApi,
 };
 
 export default api;
+
+// 导出类型
+export type {
+  UserInfo,
+  LoginParams,
+  RegisterParams,
+  UpdateUserInfoParams,
+  ChangePasswordParams,
+} from "./user/types";
+
+export type {
+  Product,
+  ProductListParams,
+  CreateProductParams,
+  UpdateProductParams,
+} from "./product/types";
